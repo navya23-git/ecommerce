@@ -1,58 +1,61 @@
 package com.example.demo.controller;
 
+import java.util.List;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.entity.Item;
 import com.example.demo.service.ItemService;
 
-import java.util.Optional;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/items")
+@CrossOrigin(origins = "http://localhost:5173")
 public class ItemController {
 
-    private final ItemService itemService;
+    @Autowired
+    private ItemService itemService;
 
-    // Constructor injection
-    public ItemController(ItemService itemService) {
-        this.itemService = itemService;
-    }
-
-    // 1. Add a new item
-    @PostMapping("/add")
-    public ResponseEntity<?> addItem(@RequestBody Item item) {
-        // Input validation
-        if (item.getName() == null || item.getName().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Item name is required");
-        }
-        if (item.getDescription() == null || item.getDescription().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Item description is required");
-        }
-        if (item.getPrice() < 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Item price cannot be negative");
-        }
-
-        Item newItem = itemService.addItem(item);
-        return ResponseEntity.status(HttpStatus.CREATED).body(newItem);
-    }
-
-    // 2. Get a single item by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getItemById(@PathVariable Long id) {
-        Optional<Item> item = itemService.getItemById(id);
-        return item
-                .<ResponseEntity<?>>map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Item with ID " + id + " not found"));
-    }
-
-    // Optional: Get all items
     @GetMapping("/all")
-    public ResponseEntity<?> getAllItems() {
-        return ResponseEntity.ok(itemService.getAllItems());
+    public List<Item> getAllItems() {
+        return itemService.getAllItems();
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<?> addItem(@Valid @RequestBody Item item) {
+        try {
+            return ResponseEntity.ok(itemService.addItem(item));
+        } catch(RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Item> getItemById(@PathVariable Long id) {
+        Item item = itemService.getItemById(id);
+        if(item != null) return ResponseEntity.ok(item);
+        else return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateItem(@PathVariable Long id, @Valid @RequestBody Item updated) {
+        try {
+            Item item = itemService.updateItem(id, updated);
+            if(item != null) return ResponseEntity.ok(item);
+            else return ResponseEntity.notFound().build();
+        } catch(RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
+        boolean deleted = itemService.deleteItem(id);
+        if(deleted) return ResponseEntity.ok().build();
+        else return ResponseEntity.notFound().build();
     }
 }
 

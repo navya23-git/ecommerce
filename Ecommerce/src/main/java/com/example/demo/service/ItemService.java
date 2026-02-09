@@ -1,38 +1,57 @@
 package com.example.demo.service;
 
+import java.util.List;
 
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.Item;
+import com.example.demo.repo.ItemRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ItemService {
 
-    // In-memory storage
-    private final List<Item> items = new ArrayList<>();
-    private Long nextId = 1L; // Auto-increment id
+    @Autowired
+    private ItemRepository itemRepository;
 
-    // Add a new item
     public Item addItem(Item item) {
-        item.setId(nextId++);
-        items.add(item);
-        return item;
+        if(itemRepository.existsByName(item.getName())) {
+            throw new RuntimeException("Item name already exists");
+        }
+        return itemRepository.save(item);
     }
 
-    // Get a single item by ID
-    public Optional<Item> getItemById(Long id) {
-        return items.stream()
-                .filter(item -> item.getId().equals(id))
-                .findFirst();
+    public Item updateItem(Long id, Item updated) {
+        return itemRepository.findById(id).map(item -> {
+            if(!item.getName().equals(updated.getName()) && itemRepository.existsByName(updated.getName())) {
+                throw new RuntimeException("Item name already exists");
+            }
+            item.setName(updated.getName());
+            item.setDescription(updated.getDescription());
+            item.setPrice(updated.getPrice());
+            item.setCategory(updated.getCategory());
+            return itemRepository.save(item);
+        }).orElse(null);
     }
 
-    // Optional: Get all items
     public List<Item> getAllItems() {
-        return items;
+        return itemRepository.findAll();
+    }
+
+    public Item getItemById(Long id) {
+        return itemRepository.findById(id).orElse(null);
+    }
+
+    public boolean deleteItem(Long id) {
+        if(itemRepository.existsById(id)) {
+            itemRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
+
+
+
+
