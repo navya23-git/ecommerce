@@ -1,0 +1,87 @@
+/* ===== Update Item Container ===== */
+ .update-item-card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 10px 0;
+  background-color: #f9f9f9;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+} 
+
+/* ===== Form inside update ===== */
+.update-item-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+} 
+
+/* ===== Inputs ===== */
+.update-item-card input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border 0.2s;
+}
+
+.update-item-card input:focus {
+  border-color: #007bff;
+  outline: none;
+} 
+
+/* ===== Buttons ===== */
+ .update-item-card button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.update-item-card button[type="submit"] {
+  background-color: #007bff;
+  color: white;
+}
+
+.update-item-card button[type="submit"]:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.update-item-card button[type="button"] {
+  background-color: #6c757d;
+  color: white;
+}
+
+.update-item-card button[type="button"]:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+} 
+
+/* ===== Error message ===== */
+.update-item-card p {
+  font-size: 0.85rem;
+  color: #e74c3c;
+  text-align: center;
+  margin: 0;
+} 
+
+/* ===== Responsive ===== */
+@media screen and (max-width: 600px) {
+  .update-item-card {
+    padding: 12px;
+  }
+
+  .update-item-card input,
+  .update-item-card button {
+    font-size: 0.9rem;
+  }
+
+  .update-item-card button {
+    width: 100%;
+  }
+} 
